@@ -1,3 +1,5 @@
+#!/usr/bin/pyhon3
+
 import json
 
 data = {}
