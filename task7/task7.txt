@@ -1,0 +1,87 @@
+
+Задание 7.1.
+
+Разработать клиент для учебного командного протокола. Протокол осуществляет
+передачу текстовых команд от сервера к клиенту. В качестве сервера выступает
+стандартное приложение nc. Команды вводятся пользователем через терминал
+приложения nc в интерактивном режиме. Сервер принимает запросы на UDP-порте
+10000.
+
+Протокол состоит из текстовых запросов и ответов. Запрос содержит любую
+строку. Смысл запросов - приглашение пользователя к вводу команды на сервере.
+Ответы могут содержать следующие команды:
+Q - команда завершения сессии,
+T <seconds> - команда задания таймаута на клиентском сокете.
+Любой другой ответ должен выводиться в клиентский терминал без каких-либо
+дополнительных действий.
+
+Пример 1.
+Сервер nc:
+$ nc -lu4 localhost 10000
+Enter a command: aaa
+Enter a command: bbb
+Enter a command: T 10
+Enter a command: ccc
+Enter a command: Q
+
+Клиент:
+$ ./lab7.1.py
+Response from ('127.0.0.1', 10000): aaa
+Response from ('127.0.0.1', 10000): bbb
+Setting timeout to 10
+Response from ('127.0.0.1', 10000): ccc
+Quitting
+
+Пример 2.
+Сервер nc:
+$ nc -lu4 localhost 10000
+Enter a command: T 5
+Enter a command: aaa
+Enter a command:
+
+Клиент:
+$ ./lab7.1.py
+Setting timeout to 5
+Response from ('127.0.0.1', 10000): aaa
+Timeout expired, quitting
+
+Задание 7.2.
+
+Разработать клиент протокола FTP (RFC 959), скачивающего указанный файл с
+удаленного сервера и записывающего его в файл в текущем каталоге. Клиент
+принимает 4 аргумента командной строки: доменное имя сервера, имя
+пользователя, пароль, путь к файлу на сервере. Скачанные данные можно
+записывать в любой локальный файл (например, ftp_out). Выдача файла сервером
+должна производиться в пассивном режиме (настраивается специальной командой
+FTP-протокола).
+
+Пример.
+Команда:
+$ ./lab7.2.py test.rebex.net demo password /pub/example/KeyGenerator.png
+Autonomous message code 220, text 'Microsoft FTP Service'
+Sending command: b'USER demo\r\n'
+Reply code 331, text 'Password required for demo.'
+Sending command: b'PASS password\r\n'
+Reply code 230, text 'User logged in.'
+Sending command: b'PASV\r\n'
+Reply code 227, text 'Entering Passive Mode (195,144,107,198,4,6).'
+Sending command: b'RETR /pub/example/KeyGenerator.png\r\n'
+Reply code 150, text 'Opening ASCII mode data connection.'
+Downloading file from ('195.144.107.198', 1030)
+Autonomous message code 226, text 'Transfer complete.'
+Sending command: b'QUIT\r\n'
+Reply code 221, text 'Goodbye.'
+
+Весь вывод в терминале является отладочным. Воспроизводить его не обязательно.
+
+Просмотр начальных байтов скачанного файла:
+$ xxd ./ftp_out | head -5
+xxd ./ftp_out  | head -5
+00000000: 8950 4e47 0d0a 1a0a 0000 000d 4948 4452  .PNG........IHDR
+00000010: 0000 01d4 0000 01b0 0802 0000 009f 2003  .............. .
+00000020: 7700 0020 0049 4441 5478 daec bd7b 7c5c  w.. .IDATx...{|\
+00000030: 55b9 3efe ae35 934b 935e a669 69d3 94b1  U.>..5.K.^.ii...
+00000040: b490 8281 694f b98b a390 1325 5402 81a6  ....iO.....%T...
+
+Файлы .png - это изображения. Подтвердить целостность скачанных файлов можно
+просмотром этих изображений.
