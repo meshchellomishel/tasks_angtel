@@ -1,0 +1,69 @@
+
+Задание 6.1.
+
+Разработать клиент протокола QOTD (RFC 865) на основе scapy. Клиент должен
+отправлять запрос публичному серверу djxmmx.net на UDP-порт 17, принимать
+ответ и выводить его в терминал.
+
+Пример.
+Команда:
+$ ./lab6.1.py
+Begin emission:
+Finished sending 1 packets.
+.*
+Received 2 packets, got 1 answers, remaining 0 packets
+"The secret of being miserable is to have leisure to bother about whether
+ you are happy or not.  The cure for it is occupation."
+ George Bernard Shaw (1856-1950)
+
+Замечание. Весь вывод, кроме последних 3 строк, был сформирован библиотекой
+scapy автоматически.
+
+Задание 6.2.
+
+Разработать клиент протокола FTP (RFC 959) на основе scapy. Клиент должен
+выполнять следующие действия.
+
+1. Установка соединения с публичным FTP-сервером test.rebex.net на TCP-порте
+21.
+2. Прием сообщения с приветствием от сервера.
+3. Отправка запроса SYST на получение информации о сервере.
+4. Получение ответа на запрос SYST с информацией о сервере.
+5. Завершение TCP-соединения.
+6. Вывод информации о сервере в терминал.
+
+Важно! По умолчанию TCP-клиент на scapy вступает в конфликт с сетевым стеком
+Linux, из-за чего TCP-соединение не устанавливается. Чтобы предотвратить этот
+конфликт, нужно настроить фильтрацию пакетов следующим образом (от root'а):
+# iptables -A OUTPUT -p tcp -m tcp --tcp-flags RST RST -j DROP
+Чтобы потом удалить этот фильтр и вернуть поведение по умолчанию, нужно ввести
+команду
+# iptables -D OUTPUT -p tcp -m tcp --tcp-flags RST RST -j DROP
+
+Пример.
+Команда:
+$ ./lab6.2.py
+Begin emission:
+Finished sending 1 packets.
+*
+Received 1 packets, got 1 answers, remaining 0 packets
+.
+Sent 1 packets.
+.
+Sent 1 packets.
+Begin emission:
+Finished sending 1 packets.
+.....*
+Received 6 packets, got 1 answers, remaining 0 packets
+.
+Sent 1 packets.
+Begin emission:
+Finished sending 1 packets.
+.*
+Received 2 packets, got 1 answers, remaining 0 packets
+.
+Sent 1 packets.
+Server system info: 215 Windows_NT
+
+Замечание. Весь вывод, кроме последней строки, был сформирован библиотекой
+scapy автоматически.
