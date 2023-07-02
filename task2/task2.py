@@ -29,11 +29,13 @@ def end_prog():
 
 
 if __name__ == "__main__":
+    MOSE_EVENT = 'event10'
+    KEYBOARD_EVENT = 'event2'
     FILE_NAME = 'output.txt'
     data = []
 
-    keyboard = ev.InputDevice("//dev//input//event2")
-    mouse_ev = ev.InputDevice("//dev//input//event5")
+    keyboard = ev.InputDevice(f"//dev//input//{KEYBOARD_EVENT}")
+    mouse_ev = ev.InputDevice(f"//dev//input//{MOSE_EVENT}")
 
     keyboard_reader = Thread(target=read_keyboard, args=(data, keyboard,), daemon=True)
     mouse_reader = Thread(target=read_mouse, args=(data, mouse_ev,), daemon=True)
@@ -43,4 +45,3 @@ if __name__ == "__main__":
         read_mouse(data, mouse_ev)
     except KeyboardInterrupt:
         end_prog()
-
