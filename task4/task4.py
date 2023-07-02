@@ -1,94 +1,31 @@
-#!/usr/bin/python3
-
-
-import signal
-import time
-import sys
-import os
-import subprocess as sb
 import json
 
+data = {}
+new_data = []
 
-def about_cmd(name, stdout=None):
-    res = {'name': name}
-    if stdout:
-        res['out'] = stdout
-    return res
+with open("input.json", "r") as read_file:
+    data = json.load(read_file)
 
-
-def write_terminated(data):
-    data[-1]['code'] = -10
-    data[-1]['signal'] = 'Terminated'
-
-
-def end_prog():
-    for cmd in data:
-        print(json.dumps(cmd, indent=True))
-
-
-def run_proc(args, subprocesses, In=None, out=sb.PIPE, text=True):
-    print(f'running... {args}')
+for i in data:
+  if type(i) == type([]):
+    new_list = []
+    for j in i:
+      if j % 2:
+        new_list += [j]
+    new_data += [new_list]
     
-    pr = sb.Popen(args, stdin=In, stdout=out, text=text)
-    subprocesses += [pr]
-    pr.wait()
-    subprocesses.pop(-1)
-
-    print(f'finished')
-    return pr
+  elif type(i) == type(dict()):
+    buf = dict()
+    for j in i:
+      if j.lower().__contains__("key"):
+        buf.update({j.upper(): i[j]})
+    new_data += [buf]
     
+  elif type(i) == type(""):
+    new_data += [i[0:len(i)//2]]
+  else:
+    new_data += [i]
 
-def handler(sig_num, frame):
-    write_terminated(data)
-    end_prog()
-    subprocesses[-1].terminate()
-    sys.exit()
-
-
-def check_file(args):
-    try:
-        return args[-2] == "<"
-    except IndexError:
-        return False
-    
-
-def analyze_args(data, argv, index, subprocesses, stdin=sb.PIPE, stdout=sb.PIPE):
-    pr = 0
-    if index != len(argv):
-        args = argv[index].split()
-        
-        if check_file(args):
-            subproc = args[0:len(args)-2]
-            
-            with open(args[-1], "w+") as file:
-                data += [about_cmd(args[0], file.name)]
-                pr = run_proc(subproc, subprocesses, In=stdin, out=file)
-
-        else:
-            data += [about_cmd(args[0])]
-            pr = run_proc(args, subprocesses, In=stdin, out=stdout)
-        
-        data[-1]['code'] = pr.returncode
-        analyze_args(data, argv, index + 1, subprocesses, pr.stdout)
-
-
-argv = sys.argv
-argv = " ".join(argv[1:len(argv)])
-
-signal.signal(signal.SIGUSR1, handler)
-
-data = []
-subprocesses = []
-
-try:
-    if argv.count('|') != 0:
-        argv = argv.split('|')
-
-        analyze_args(data, argv, 0, subprocesses)
-    else:
-        analyze_args(data, [argv], 0, subprocesses)
-except KeyboardInterrupt:
-    write_terminated(data)
-
-end_prog()
-    
+with open("output1.json", "w") as outfile:
+  json.dump(new_data, outfile, indent=True)
+  
