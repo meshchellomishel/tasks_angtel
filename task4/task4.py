@@ -16,8 +16,8 @@ def about_cmd(name, stdout=None):
     return res
 
 
-def write_terminated(data):
-    data[-1]['code'] = -10
+def write_terminated(data, code):
+    data[-1]['code'] = code
     data[-1]['signal'] = 'Terminated'
 
 
@@ -39,7 +39,7 @@ def run_proc(args, subprocesses, In=None, out=sb.PIPE, text=True):
 
 
 def handler(sig_num, frame):
-    write_terminated(data)
+    write_terminated(data, 10)
     end_prog()
     subprocesses[-1].terminate()
     sys.exit()
@@ -89,6 +89,7 @@ if argv:
         else:
             analyze_args(data, [argv], 0, subprocesses)
     except KeyboardInterrupt:
-        write_terminated(data)
+        write_terminated(data, -2)
+        subprocesses[-1].terminate()
 
     end_prog()
